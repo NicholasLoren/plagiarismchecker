@@ -238,7 +238,15 @@ function createAccordionItem(
   return accordionItem
 }
 
-function createCard({id,title,plagiarism,words,originality,created,status_label}) {
+function createCard({
+  id,
+  title,
+  plagiarism,
+  words,
+  originality,
+  created,
+  status_label,
+}) {
   // Create the card container
   var card = $('<div>', {
     class: 'card col-12 shadow-lg p-3',
@@ -253,7 +261,7 @@ function createCard({id,title,plagiarism,words,originality,created,status_label}
   hstackDiv.append(
     $('<small>', {
       class: 'p-2',
-      text: 'ID# '+id,
+      text: 'ID# ' + id,
     })
   )
   hstackDiv.append(
@@ -277,7 +285,7 @@ function createCard({id,title,plagiarism,words,originality,created,status_label}
       class: 'py-2',
     }).append(
       $('<a>', {
-        href: "./view-report.php?report_id="+id,
+        href: './view-report.php?report_id=' + id,
         class: 'fs-5 text-decoration-none text-black',
         text: title,
       })
@@ -333,7 +341,7 @@ function createCard({id,title,plagiarism,words,originality,created,status_label}
           text: 'Originality: ',
         }).append(
           $('<b>', {
-            text: originality+'%',
+            text: originality + '%',
           })
         )
       ),
@@ -361,58 +369,49 @@ document.addEventListener('DOMContentLoaded', () => {
       const filename = formData.get('filename')
       //make requests appropriately depending on the analyze method
 
-      if (analyzeMethod == 'textSearch') {
-        $.ajax({
-          method: 'POST',
-          url: './requests/textSearch.php',
-          data: { textContent: searchText },
-          beforeSend: () => {},
-          success: (response) => {
-            //create another request to check for the report if its ready
-            var reportId = response.reportId
-            $.ajax({
-              method: 'POST',
-              url: './requests/checkReportStatus.php',
-              data: { reportId: response.reportId },
-              beforeSend: () => {},
-              success: (response) => {
-                spinner.classList.add('d-none')
-                location.assign('view-report.php?report_id=' + reportId)
-              },
-              error: () => {},
-            })
-          },
-          error: (error) => {
-            console.log(error)
-            spinner.classList.add('d-none')
-          },
-        })
-      } else if (analyzeMethod == 'fileSearch') {
-        $.ajax({
-          method: 'POST',
-          url: './requests/fileSearch.php',
-          data: { filename },
-          beforeSend: () => {},
-          success: (response) => {
-            //create another request to check for the report if its ready
-            var reportId = response.reportId
-            $.ajax({
-              method: 'POST',
-              url: './requests/checkReportStatus.php',
-              data: { reportId: response.reportId },
-              beforeSend: () => {},
-              success: (response) => {
-                spinner.classList.add('d-none')
-                location.assign('view-report.php?report_id=' + reportId)
-              },
-              error: () => {},
-            })
-          },
-          error: (error) => {
-            console.log(error)
-            spinner.classList.add('d-none')
-          },
-        })
+      const targetUrl = {
+        fileSearch: './requests/fileSearch.php',
+        textSearch: './requests/textSearch.php',
       }
+
+      $.ajax({
+        method: 'POST',
+        url: targetUrl[analyzeMethod],
+        data: { textContent: searchText },
+        beforeSend: () => {},
+        success: (response) => {
+          //create another request to check for the report if its ready
+          var reportId = response.reportId
+
+          const callback = (reportId, interval) => {
+            $.ajax({
+              method: 'POST',
+              url: './requests/checkReportStatus.php',
+              data: { reportId: response.reportId },
+              beforeSend: () => {},
+              success: (response) => {
+                 
+                if (response.data.status == 2) {
+                  clearInterval(interval)
+                  spinner.classList.add('d-none')
+                  location.assign('view-report.php?report_id=' + reportId)
+                }
+              },
+              error: () => {},
+            })
+          }
+          const interval = setInterval(() => {
+            callback(reportId, interval)
+          }, 1000)
+        },
+        error: (error) => {
+          console.log(error)
+          spinner.classList.add('d-none')
+        },
+      })
+
+
+
+      
     }
 })
