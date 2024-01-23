@@ -54,7 +54,7 @@ if (!$loggedIn) {
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item " href="./profile.php">My Profile</a></li>
                             <li><a class="dropdown-item " href="javascript:void(0)"
-                                    onclick="copyToClipboard('https://pladiarismchecker.com')">Invite Friends</a></li>
+                                    onclick="copyToClipboard('https://plagiarismchecker.itinsiderafrica.com')">Invite Friends</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
