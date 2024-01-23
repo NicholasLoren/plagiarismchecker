@@ -1,0 +1,6 @@
+html,.btn,.nav,.nav-link{
+  font-family: Roboto;
+}
+.bg-tree {
+  background-image: url('../images/bg-trees-2.webp');
+}
