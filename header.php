@@ -22,7 +22,7 @@ if (!$loggedIn) {
     <script src="./assets/jquery/jquery.js" defer=""></script>
     <script src="./assets/circle-progressbar/circle-progress.min.js" defer=""></script>
 </head> 
-<body class="roboto h-100  bg-tree">
+<body class="roboto min-vh-100  bg-tree">
 
     <nav class="navbar navbar-expand-lg bg-success">
         <div class="container">

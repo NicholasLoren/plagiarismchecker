@@ -17,6 +17,8 @@ $files = [
 
 $fetchedData = json_decode($api->createAction($data, $files));
 
+
+
 if ($fetchedData->code == 200) {
     $reportId = $fetchedData->data->id;
     //save the data to my database

@@ -369,16 +369,24 @@ document.addEventListener('DOMContentLoaded', () => {
       const filename = formData.get('filename')
       //make requests appropriately depending on the analyze method
 
-      const targetUrl = {
-        fileSearch: './requests/fileSearch.php',
-        textSearch: './requests/textSearch.php',
-      }
+      const options = {
+        textSearch: {
+          url: './requests/textSearch.php',
+          data: { textContent: searchText },
+        },
+        fileSearch: {
+          url: './requests/fileSearch.php',
+          data: { filename },
+        },
+      } 
 
       $.ajax({
         method: 'POST',
-        url: targetUrl[analyzeMethod],
-        data: { textContent: searchText },
-        beforeSend: () => {},
+        url: options[analyzeMethod]['url'],
+        data: options[analyzeMethod]['data'],
+        beforeSend: () => {
+          spinner.parentElement.classList.add('disabled')
+        },
         success: (response) => {
           //create another request to check for the report if its ready
           var reportId = response.reportId
@@ -388,30 +396,28 @@ document.addEventListener('DOMContentLoaded', () => {
               method: 'POST',
               url: './requests/checkReportStatus.php',
               data: { reportId: response.reportId },
-              beforeSend: () => {},
               success: (response) => {
-                 
                 if (response.data.status == 2) {
                   clearInterval(interval)
+                  spinner.parentElement.classList.remove('disabled')
                   spinner.classList.add('d-none')
                   location.assign('view-report.php?report_id=' + reportId)
                 }
               },
-              error: () => {},
+              error: () => {
+                spinner.parentElement.classList.remove('disabled')
+              },
             })
           }
           const interval = setInterval(() => {
             callback(reportId, interval)
-          }, 1000)
+          }, 2000)
         },
         error: (error) => {
           console.log(error)
+          spinner.parentElement.classList.remove('disabled')
           spinner.classList.add('d-none')
         },
       })
-
-
-
-      
     }
 })
