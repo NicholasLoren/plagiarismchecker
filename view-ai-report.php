@@ -151,7 +151,7 @@ require_once "header.php";
                     $("#totalWords").html(words)
                     $("#dateCreated").html(secondsToHumanDate(created))
                     $('#progressBar').circleProgress('value', ai_average_probability / 100);
-                    $('#progressBarValue').html(ai_average_probability + "%");
+                    $('#progressBarValue').html(Number(ai_average_probability).toFixed(2) + "%");
                 },
                 error: (error) => {
                     console.log(error)
