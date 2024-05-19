@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         if (empty($PlagiarismData->reportError())) {
             $success = "Account created successfully. <a href='login.php' class='fw-bold text-black text-decoration-none'>Login here</a>";
         } else {
-            $errors['error'] = "Could not establish connection. Try again later";
+            $errors['error'] = "Could not establish connection. Try again later"; 
         }
     }
 }

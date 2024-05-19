@@ -2,7 +2,7 @@
 session_start();
 /* @var $api Reports */
 require_once '../init-api.php';
-include_once("../Database.php");
+include_once ("../Database.php");
 require_once '../PlagiarismData.php';
 
 $PlagiarismData = new PlagiarismData();
@@ -15,14 +15,14 @@ $files = [
     'file' => realpath('../uploads/' . $filename),
 ];
 
-$fetchedData = json_decode($api->createAction($data, $files));
+$fetchedData = json_decode($api->createActionAI($data, $files));
 
 
 
 if ($fetchedData->code == 202) {
     $reportId = $fetchedData->data->id;
     //save the data to my database
-    $result = $PlagiarismData->addUserReport(["userId" => $userId, "reportId" => $reportId, "type" => "NORMAL"]);
+    $result = $PlagiarismData->addUserReport(["userId" => $userId, "reportId" => $reportId, "type" => "AI"]);
 
     if (empty($PlagiarismData->reportError())) {
         return print json_encode(["reportId" => $reportId]);

@@ -32,19 +32,19 @@ class Reports
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $postFields);
         }
-
+        
         // HTTP basic authentication
         curl_setopt($curl, CURLOPT_USERPWD, $this->apiUser . ':' . $this->apiKey);
-
+        
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-
+        
         $data = curl_exec($curl);
         $info = curl_getinfo($curl);
-        $error = curl_error($curl);
+        $error = curl_error($curl); 
         curl_close($curl);
 
         if ($error) {
@@ -143,6 +143,48 @@ class Reports
     public function statusAction($id, $data = array())
     {
         $url = $this->apiUrl . '/reports/status/' . $id;
+        return $this->post($url, $data);
+    }
+
+
+    public function indexActionAI($data)
+    {
+        $url = $this->apiUrl . '/ai-reports';
+        return $this->post($url, $data);
+    }
+
+    public function createActionAI($data, $files = array())
+    {
+        $url = $this->apiUrl . '/ai-reports/create';
+        return $this->post($url, $data, $files);
+    }
+
+    public function viewActionAI($id, $data = array())
+    {
+        $url = $this->apiUrl . '/ai-reports/view/' . $id;
+        return $this->post($url, $data);
+    }
+    public function viewActionHighlightedAI($id, $data = array())
+    {
+        $url = $this->apiUrl . '/ai-reports/html/' . $id;
+        return $this->post($url, $data);
+    }
+
+    public function updateActionAI($id, $data = array())
+    {
+        $url = $this->apiUrl . '/ai-reports/update/' . $id;
+        return $this->post($url, $data);
+    }
+
+    public function deleteActionAI($id, $data = array())
+    {
+        $url = $this->apiUrl . '/ai-reports/delete/' . $id;
+        return $this->post($url, $data);
+    }
+
+    public function statusActionAI($id, $data = array())
+    {
+        $url = $this->apiUrl . '/ai-reports/status/' . $id;
         return $this->post($url, $data);
     }
 

@@ -14,16 +14,11 @@ $data = [
     'show_relations' => 1
 ];
 
-$fetchedData = json_decode($api->createAction($data));
+$fetchedData = json_decode($api->createActionAI($data));
 if ($fetchedData->code == 202) {
     $reportId = $fetchedData->data->id;
     //save the data to my database
-    $result = $PlagiarismData->addUserReport(["userId" => $userId, "reportId" => $reportId, "type" => "NORMAL"]);
+    $result = $PlagiarismData->addUserReport(["userId" => $userId, "reportId" => $reportId,"type"=>"AI"]);
 
-    if (empty($PlagiarismData->reportError())) {
-        return print json_encode(["reportId" => $reportId]);
-    } else {
-
-        return print json_encode(["error" => "Action failed" . $PlagiarismData->reportError()]);
-    }
+    return print json_encode(empty($PlagiarismData->reportError()) ? ["reportId" => $reportId] : ["error" => "Action failed" . $PlagiarismData->reportError()]);
 }

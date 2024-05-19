@@ -42,4 +42,8 @@ abstract class Database
         return mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
 
+    function error(){
+        return mysqli_error($this->DB_CONNECTION);
+    }
+
 }

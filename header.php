@@ -22,7 +22,7 @@ if (!$loggedIn) {
     <script src="./assets/jquery/jquery.js" defer=""></script>
     <script src="./assets/circle-progressbar/circle-progress.min.js" defer=""></script>
 </head> 
-<body class="roboto min-vh-100  bg-tree">
+<body class="roboto min-vh-100  bg-tree d-flex flex-column">
 
     <nav class="navbar navbar-expand-lg bg-success">
         <div class="container">
@@ -43,8 +43,14 @@ if (!$loggedIn) {
                             check</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link  text-white text-uppercase font-weight-bolder" href="./ai-index.php">AI Detection</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link  text-white text-uppercase font-weight-bolder" href="all-reports.php">Reports</a>
                     </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link  text-white text-uppercase font-weight-bolder" href="all-ai-reports.php">AI Reports</a>
+                    </li> -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">

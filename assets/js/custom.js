@@ -45,7 +45,7 @@ function uploadFile() {
 
     formData.append('file', file)
 
-    xhr.open('POST', '../../upload.php', true)
+    xhr.open('POST', './upload.php', true)
 
     xhr.upload.onprogress = function (e) {
       if (e.lengthComputable) {
@@ -65,8 +65,9 @@ function uploadFile() {
         contentTextarea.classList.add('d-none')
 
         //update the form action
-        setAnalyzeMethod('fileSearch')
+        setAnalyzeMethod('fileSearch') 
 
+        console.log(xhr.response)
         //update file name input
         filename.value = xhr.response['filename']
       }
@@ -355,9 +356,128 @@ function createCard({
   return card
 }
 
+
+function createAICard({
+  id,
+  title,
+  plagiarism,
+  words,
+  originality,
+  created,
+  status_label,
+}) {
+  // Create the card container
+  var card = $('<div>', {
+    class: 'card col-12 shadow-lg p-3',
+  })
+
+  // Create the first inner div with class 'hstack'
+  var hstackDiv = $('<div>', {
+    class: 'hstack gap-3',
+  })
+
+  // Append small elements to 'hstackDiv'
+  hstackDiv.append(
+    $('<small>', {
+      class: 'p-2',
+      text: 'ID# ' + id,
+    })
+  )
+  hstackDiv.append(
+    $('<small>', {
+      class: 'vr',
+    })
+  )
+  hstackDiv.append(
+    $('<small>', {
+      class: 'p-2',
+      text: secondsToHumanDate(created),
+    })
+  )
+
+  // Append 'hstackDiv' to the card
+  card.append(hstackDiv)
+
+  // Append the second inner div with class 'py-2'
+  card.append(
+    $('<div>', {
+      class: 'py-2',
+    }).append(
+      $('<a>', {
+        href: './view-ai-report.php?report_id=' + id,
+        class: 'fs-5 text-decoration-none text-black',
+        text: title,
+      })
+    )
+  )
+
+  // Append the third inner div with class 'py-2 d-flex align-items-center gap-2'
+  card.append(
+    $('<div>', {
+      class: 'py-2 d-flex align-items-center gap-2',
+    }).append(
+      $('<div>', {
+        class: 'progress w-25',
+        role: 'progressbar',
+        'aria-valuenow': plagiarism,
+        'aria-valuemin': '0',
+        'aria-valuemax': '100',
+        style: 'height: 10px;',
+      }).append(
+        $('<div>', {
+          class: 'progress-bar bg-danger',
+          style: `width: ${plagiarism}%;`,
+        })
+      ),
+      $('<small>', {
+        class: 'text-danger',
+        text: `${plagiarism}% Plagiarism`,
+      })
+    )
+  )
+
+  // Append the fourth inner div with class 'd-flex justify-content-between align-items-center'
+  card.append(
+    $('<div>', {
+      class: 'd-flex justify-content-between align-items-center',
+    }).append(
+      $('<div>', {
+        class: 'hstack gap-3',
+      }).append(
+        $('<small>', {
+          class: 'py-2',
+          text: 'Words: ',
+        }).append(
+          $('<b>', {
+            text: words,
+          })
+        ),
+        $('<small>', {
+          class: 'vr',
+        }),
+        $('<small>', {
+          class: 'py-2 text-primary',
+          text: 'Originality: ',
+        }).append(
+          $('<b>', {
+            text: originality + '%',
+          })
+        )
+      ),
+      $('<span>', {
+        class: `badge bg-success`,
+        text: status_label,
+      })
+    )
+  )
+
+  return card
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const plagiarismForm = document.getElementById('plagiarism-form')
   const spinner = document.getElementById('spinner')
+  const aiForm = document.getElementById('ai-form')
 
   if (plagiarismForm)
     plagiarismForm.onsubmit = (event) => {
@@ -413,8 +533,67 @@ document.addEventListener('DOMContentLoaded', () => {
             callback(reportId, interval)
           }, 2000)
         },
-        error: (error) => {
-          console.log(error)
+        error: (error) => { 
+          spinner.parentElement.classList.remove('disabled')
+          spinner.classList.add('d-none')
+        },
+      })
+    }
+  if (aiForm)
+    aiForm.onsubmit = (event) => {
+      event.preventDefault()
+      spinner.classList.remove('d-none')
+      const formData = new FormData(event.target)
+      const analyzeMethod = formData.get('analyzeMethod')
+      const searchText = formData.get('searchText')
+      const filename = formData.get('filename')
+      //make requests appropriately depending on the analyze method
+
+      const options = {
+        textSearch: {
+          url: './requests/aiTextSearch.php',
+          data: { textContent: searchText },
+        },
+        fileSearch: {
+          url: './requests/aiFileSearch.php',
+          data: { filename },
+        },
+      } 
+
+      $.ajax({
+        method: 'POST',
+        url: options[analyzeMethod]['url'],
+        data: options[analyzeMethod]['data'],
+        beforeSend: () => {
+          spinner.parentElement.classList.add('disabled')
+        },
+        success: (response) => {
+          //create another request to check for the report if its ready
+          var reportId = response.reportId
+
+          const callback = (reportId, interval) => {
+            $.ajax({
+              method: 'POST',
+              url: './requests/aiCheckReportStatus.php',
+              data: { reportId: response.reportId },
+              success: (response) => {
+                if (response.data.status == 2) {
+                  clearInterval(interval)
+                  spinner.parentElement.classList.remove('disabled')
+                  spinner.classList.add('d-none')
+                  location.assign('view-ai-report.php?report_id=' + reportId)
+                }
+              },
+              error: () => {
+                spinner.parentElement.classList.remove('disabled')
+              },
+            })
+          }
+          const interval = setInterval(() => {
+            callback(reportId, interval)
+          }, 2000)
+        },
+        error: (error) => { 
           spinner.parentElement.classList.remove('disabled')
           spinner.classList.add('d-none')
         },
